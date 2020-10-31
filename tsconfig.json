@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "jsx": "react",
+    "sourceMap": true,
+    "target": "es5",
+    "allowJs": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "baseUrl": "."
+  },
+  "exclude": [
+    "node_modules",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "webpack/webpack.config.ts"
+  ]
+}
