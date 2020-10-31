@@ -28,17 +28,21 @@ export default class Grid {
       }
     }
     happens(this);
-    // this.increaseDifficulty();
+    this.increaseDifficulty();
   }
 
-  increaseDifficulty() {
-    const interval = setInterval(this.start, 2000 / this.difficulty, this.intervals.length);
+  public increaseDifficulty() {
+    const interval = setTimeout(this.start, (1000 + Math.random() * 2000) / this.difficulty, this.intervals.length);
     this.intervals.push(interval);
   }
 
   start(level: number) {
-    const rndColumn = Math.floor(Math.random() * this.options.columns)
-    const rndRow = Math.floor(Math.random() * this.options.columns)
+    let rndColumn = Math.floor(Math.random() * this.options.columns)
+    let rndRow = Math.floor(Math.random() * this.options.rows)
+    while (this.grid[rndColumn][rndRow] === 1)  {
+      rndColumn = Math.floor(Math.random() * this.options.columns)
+      rndRow = Math.floor(Math.random() * this.options.rows)
+    }
     if (!this.cells[level]) {
       this.cells[level] = {
         row: rndRow,
@@ -51,12 +55,26 @@ export default class Grid {
     }
     this.grid[this.cells[level].column][this.cells[level].row] = 1;
     this.emit('update', this.output())
+    this.intervals[level] = setTimeout(this.start, (1000 + Math.random() * 1000) / this.difficulty, level)
+  }
+
+  setState(position: any, state: number) {
+    this.grid[position.column][position.row] = 0;
+    this.emit('update', this.output())
   }
 
   clear() {
     this.intervals.forEach((interval: any) => {
       clearInterval(interval);
     })
+  }
+
+  public iterate(cb: Function) {
+    for (let col = 0; col < this.columns; col ++) {
+      for (let row = 0; row < this.rows; row ++) {
+        cb(col, row);
+      }
+    }
   }
 
   get columns() {

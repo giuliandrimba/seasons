@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js'
 import images from './images';
 import Grid from './model/Grid';
 import GridView from './view/GridView';
+import happens from 'happens';
 
 export default class WhackAMole {
   private canvas: HTMLCanvasElement;
@@ -12,11 +13,12 @@ export default class WhackAMole {
   private grid: Grid;
   private gridView: GridView;
   constructor(canvas: any, theme: any) {
+    happens(this);
     this.loader = PIXI.Loader.shared;
     this.canvas = canvas;
     this.theme = theme;
     this.grid = new Grid({
-      columns: 3,
+      columns: 4,
       rows: 3
     })
     this.init();

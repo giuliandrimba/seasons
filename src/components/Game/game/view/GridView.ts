@@ -1,5 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 import Grid from '../model/Grid';
+import Cell from './Cell';
 
 const square = (width: number, height: number, color: number) => {
   const rect = new Container();
@@ -18,11 +19,14 @@ export default class GridView {
   private borderRight: Container;
   private borderBottom: Container;
   private borderLeft: Container;
-  private gridModel: Grid;
+  private gridModel: any;
   private width: number;
   private height: number;
   private color: number;
+  private cells: Array<Array<Cell>> = [];
+  private counter: number = 0;
   constructor(stage: Container, gridModel: Grid, theme: any) {
+    this.clickedCell = this.clickedCell.bind(this)
     this.gridModel = gridModel;
     this.color = theme.color.white.replace('#', '0x')
     this.width = this.gridModel.columns * CELL_SIZE;
@@ -32,6 +36,9 @@ export default class GridView {
     this.container.y = window.innerHeight / 2 - this.height / 2
     stage.addChild(this.container);
     this.buildGrid();
+    this.addCells();
+    this.update = this.update.bind(this);
+    this.gridModel.on('update', this.update);
   }
 
   buildGrid() {
@@ -68,5 +75,43 @@ export default class GridView {
       colContainer.x = 0;
       this.container.addChild(colContainer)
     }
+  }
+
+  update(grid: any) {
+    this.gridModel.iterate((col: number, row: number) => {
+      this.cells[col][row].update(grid[col][row]);
+    })
+  }
+
+  checkLevel() {
+    this.counter += 1;
+    if (this.counter % 10 === 0 && this.counter <= 10) {
+      this.gridModel.increaseDifficulty();
+    }
+    if (this.counter === 20) {
+      this.gridModel.clear();
+    }
+  }
+
+  clickedCell(cell: Cell) {
+    this.checkLevel();
+    this.gridModel.setState(cell.gridPosition, 0);
+  }
+
+  addCells() {
+    this.gridModel.iterate((col: number, row: number) => {
+      if (!this.cells[col]) {
+        this.cells[col] = [];
+      }
+      if (!this.cells[row]) {
+        this.cells[row] = [];
+      }
+
+      const c = new Cell(this.container, CELL_SIZE, `${col}:${row}`);
+      c.on('click', this.clickedCell);
+      c.x = col * CELL_SIZE;
+      c.y = row * CELL_SIZE;
+      this.cells[col][row] = c;
+    })
   }
 }
