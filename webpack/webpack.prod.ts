@@ -10,7 +10,8 @@ const config = (env: any, args: WebpackConfig): WebpackConfig => {
   return merge(common, {
     mode: 'production',
     output: {
-      filename: '[name].[contentHash].bundle.js'
+      filename: '[name].[contentHash].bundle.js',
+      path: path.resolve(__dirname, '..', 'dist'),
     },
     devtool: 'source-map',
     optimization: {

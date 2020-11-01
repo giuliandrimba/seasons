@@ -1,4 +1,5 @@
 import { Container, Graphics, Text } from 'pixi.js';
+import { BulgePinchFilter } from '@pixi/filter-bulge-pinch';
 import Grid from '../model/Grid';
 import Cell from './Cell';
 import happens from 'happens';
@@ -32,6 +33,13 @@ export default class GridView {
   private currentLetter: string = '';
   private wordIndex: number = 0;
   private counter: number = 0;
+  private filter :any;
+  private filterAnimation: {
+    center: {
+      x: number,
+      y: number,
+    },
+  }
   public on: Function;
   public emit: Function;
   private score: Text;
@@ -39,11 +47,16 @@ export default class GridView {
     happens(this);
     this.clickedCell = this.clickedCell.bind(this)
     this.nextLevel = this.nextLevel.bind(this)
+    this.onMouseMove = this.onMouseMove.bind(this)
+    this.filterAnimation = { center: { x: 0.5, y: 0.5 } }
     this.gridModel = gridModel;
     this.color = theme.color.white.replace('#', '0x')
     this.width = this.gridModel.columns * CELL_SIZE;
     this.height = this.gridModel.rows * CELL_SIZE;
     this.container = new Container();
+    this.container.buttonMode = true;
+    this.filter = new BulgePinchFilter({ strength: 1, radius: 100 })
+    // stage.filters = [this.filter];
     this.resize();
     this.container.alpha = 0;
     stage.addChild(this.container);
@@ -103,8 +116,24 @@ export default class GridView {
     this.container.addChild(this.score);
   }
 
+  onMouseMove(e: any) {
+
+    const x = e.clientX;
+    const y = e.clientY;
+
+    gsap.to(this.filterAnimation.center, {
+      duration: 0.5,
+      x: x / window.innerWidth,
+      y: y / window.innerHeight,
+      onUpdate: () => {
+        this.filter.center = [this.filterAnimation.center.x, this.filterAnimation.center.y]
+      }
+    })
+  }
+
   intro() {
     gsap.to(this.container, { duration: 1, alpha: 1, ease: 'expo.out', onComplete: this.nextLevel})
+    window.addEventListener('mousemove', this.onMouseMove);
   }
 
   nextLevel() {

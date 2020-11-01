@@ -1302,7 +1302,7 @@
     "@pixi/core" "5.3.3"
     "@pixi/settings" "5.3.3"
 
-"@pixi/filter-bulge-pinch@3.1.1":
+"@pixi/filter-bulge-pinch@3.1.1", "@pixi/filter-bulge-pinch@^3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@pixi/filter-bulge-pinch/-/filter-bulge-pinch-3.1.1.tgz#cd2a44e9800e74101c01c9ed9c884e890d52c22f"
 

@@ -30,19 +30,26 @@ export default class Background {
 
   intro(cb: any) {
     gsap.to(this.images[0], { duration: 0.5, alpha: 1 })
-    gsap.to(this.filter.scale, { duration: 2, ease: 'expo.out', x: FACTOR, y: FACTOR, onComplete: cb });
+    gsap.to(this.filter.scale, { duration: 2, ease: 'expo.out', x: FACTOR, y: FACTOR });
+    setTimeout(cb, 1);
   }
 
   progress(value: number) {
     gsap.to(this.filter.scale, { duration: 1, ease: 'power4.out', x: FACTOR - (FACTOR * value), y: FACTOR - (FACTOR * value) });
   }
 
-  complete() {
-    gsap.to(this.filter.scale, { duration: 3, x: 0, y: 0, ease: 'power4.out' });
+  complete(index: number, cb: any) {
+    gsap.to(this.filter.scale, { duration: 3, x: 0, y: 0, ease: 'power4.out', onComplete: cb });
+    gsap.to(this.images[this.index], { duration: 1, alpha: 0, delay: 3 })
+    gsap.to(this.filter.scale, { duration: 2, ease: 'expo.out', x: FACTOR, y: FACTOR, delay: 3 });
+    this.index = this.index < 3 ? this.index + 1 : this.index = 0;
+    gsap.to(this.images[this.index], { duration: 1, alpha: 1, delay: 3 })
   }
 
   nextLevel(index: number) {
-
+    gsap.to(this.images[this.index], { duration: 1, alpha: 0 })
+    gsap.to(this.filter.scale, { duration: 2, ease: 'expo.out', x: FACTOR, y: FACTOR });
+    gsap.to(this.images[this.index], { duration: 1, alpha: 1 })
   }
 
   resize() {

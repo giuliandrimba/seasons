@@ -6,6 +6,16 @@ import happens from 'happens';
 import FontFaceObserver from 'fontfaceobserver';
 import Background from './Background';
 
+const square = (width: number, height: number, color: number) => {
+  const rect = new PIXI.Container();
+  const graphics = new PIXI.Graphics();
+  graphics.beginFill(color);
+  graphics.alpha = 0;
+  graphics.drawRect(0, 0, width, height);
+  rect.addChild(graphics);
+  return rect;
+}
+
 export default class WhackAMole {
   private canvas: HTMLCanvasElement;
   private pixi: PIXI.Application;
@@ -16,6 +26,7 @@ export default class WhackAMole {
   private gridView: GridView;
   private background: Background;
   private loaded: boolean = false;
+  private gridContainer: any;
   constructor(canvas: any, theme: any) {
     happens(this);
     this.loader = PIXI.Loader.shared;
@@ -31,12 +42,18 @@ export default class WhackAMole {
   init() {
     this.pixi = new PIXI.Application({ resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
     this.sprites = [];
+    this.gridContainer = square(window.innerWidth, window.innerHeight, 0xFFFFFF)
     this.preloadAssets().then(() => {
       this.loaded = true;
       this.background = new Background(this.pixi.stage, this.sprites);
-      this.gridView = new GridView(this.pixi.stage, this.grid, this.theme);
+      this.gridView = new GridView(this.gridContainer, this.grid, this.theme);
+      this.pixi.stage.addChild(this.gridContainer);
       this.gridView.on('progress', this.background.progress);
-      this.gridView.on('complete', this.background.complete);
+      this.gridView.on('complete', (index: number) => {
+        this.background.complete(index, () => {
+          this.gridView.nextLevel();
+        })
+      });
       this.background.intro(() => {
         this.gridView.intro();
       })
