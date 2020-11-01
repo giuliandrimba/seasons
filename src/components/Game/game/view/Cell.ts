@@ -60,6 +60,7 @@ export default class Cell {
         this.finalLetter = finalLetter;
         this.show(finalLetter);
       } else {
+        this.finalLetter = finalLetter;
         this.hide();
       }
     }
@@ -70,9 +71,10 @@ export default class Cell {
     gsap.fromTo(this.animation, {progress: 0.5}, {
       duration: 0.7,
       progress: 1,
+      ease: 'power4.out',
       onUpdate: () => {
         this.sprite.scale.set(this.animation.progress);
-        const index = Math.floor(alphabet.length * this.animation.progress);
+        const index = Math.floor(Math.random() * alphabet.length);
         if (this.animation.progress >= 0.99) {
           this.text.text = finalLetter;
         } else {
@@ -83,11 +85,12 @@ export default class Cell {
   }
   hide() {
     gsap.killTweensOf(this.animation);
+    this.text.text = this.finalLetter;
     gsap.to(this.animation, {
       duration: 0.5,
       progress: 0,
-      delay: 0.1,
-      ease: 'power3.out',
+      delay: 0.05,
+      ease: 'expo.out',
       onUpdate: () => {
         this.sprite.scale.set(this.animation.progress);
       }

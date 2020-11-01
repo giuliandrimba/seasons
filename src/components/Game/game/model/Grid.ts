@@ -7,20 +7,16 @@ export interface GridOptions {
 
 export default class Grid {
   private grid: Array<Array<number>> = []
-  private cells: Array<{row: number, column: number}>;
-  private difficulty: number = 1
+  private cell: {row: number, column: number};
   private options: GridOptions;
-  private intervals: any;
+  private interval: any;
   private emit: Function;
   constructor(options: GridOptions) {
 
     this.start = this.start.bind(this);
-    this.increaseDifficulty = this.increaseDifficulty.bind(this);
     this.clear = this.clear.bind(this);
 
     this.options = options;
-    this.intervals = [];
-    this.cells = [];
     for (let c = 0; c < options.columns; c++) {
       this.grid[c] = [];
       for (let r = 0; r < options.rows; r++) {
@@ -28,34 +24,28 @@ export default class Grid {
       }
     }
     happens(this);
-    this.increaseDifficulty();
   }
 
-  public increaseDifficulty() {
-    const interval = setTimeout(this.start, (1000 + Math.random() * 500) / this.difficulty, this.intervals.length);
-    this.intervals.push(interval);
-  }
-
-  start(level: number) {
+  start() {
     let rndColumn = Math.floor(Math.random() * this.options.columns)
     let rndRow = Math.floor(Math.random() * this.options.rows)
     while (this.grid[rndColumn][rndRow] === 1)  {
       rndColumn = Math.floor(Math.random() * this.options.columns)
       rndRow = Math.floor(Math.random() * this.options.rows)
     }
-    if (!this.cells[level]) {
-      this.cells[level] = {
+    if (!this.cell) {
+      this.cell = {
         row: rndRow,
         column: rndColumn,
       }
     } else {
-      this.grid[this.cells[level].column][this.cells[level].row] = 0;
-      this.cells[level].row = rndRow;
-      this.cells[level].column = rndColumn;
+      this.grid[this.cell.column][this.cell.row] = 0;
+      this.cell.row = rndRow;
+      this.cell.column = rndColumn;
     }
-    this.grid[this.cells[level].column][this.cells[level].row] = 1;
+    this.grid[this.cell.column][this.cell.row] = 1;
     this.emit('update', this.output())
-    this.intervals[level] = setTimeout(this.start, (1000 + Math.random() * 500) / this.difficulty, level)
+    this.interval = setTimeout(this.start, (1000 + Math.random() * 500));
   }
 
   setState(position: any, state: number) {
@@ -64,9 +54,7 @@ export default class Grid {
   }
 
   clear() {
-    this.intervals.forEach((interval: any) => {
-      clearInterval(interval);
-    })
+    clearInterval(this.interval);
   }
 
   public iterate(cb: Function) {

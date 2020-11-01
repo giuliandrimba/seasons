@@ -24,7 +24,9 @@ export default class GridView {
   private height: number;
   private color: number;
   private cells: Array<Array<Cell>> = [];
-  private word: string = 'WINTER';
+  private levels: Array<string> = ['WINTER', 'SPRING', 'SUMMER', "FALL"]
+  private word: string = '';;
+  private currentLevel: number = -1;
   private currentLetter: string = '';
   private wordIndex: number = 0;
   private counter: number = 0;
@@ -44,6 +46,7 @@ export default class GridView {
     this.clicked = this.clicked.bind(this);
     this.gridModel.on('update', this.update);
     this.gridModel.on('clicked', this.clicked);
+    this.nextLevel();
   }
 
   buildGrid() {
@@ -82,12 +85,26 @@ export default class GridView {
     }
   }
 
+  nextLevel() {
+    this.gridModel.clear();
+    this.currentLevel = this.currentLevel < 3 ? this.currentLevel + 1 : this.currentLevel = 0;
+    this.word = this.levels[this.currentLevel];
+    this.wordIndex = 0;
+    this.currentLetter = this.getNextWord();
+    this.gridModel.start();
+  }
+
   clicked(grid: any) {
+    const next = this.word.toString().charAt(this.wordIndex);
+    if (!next.length) {
+      this.nextLevel();
+      return;
+    }
     this.updateState(grid);
+    this.currentLetter = this.getNextWord();
   }
 
   update(grid: any) {
-    this.currentLetter = this.getNextWord();
     this.updateState(grid);
   }
 
@@ -97,11 +114,11 @@ export default class GridView {
     })
   }
 
-  getNextWord(): string {
-    const char = this.word.charAt(this.wordIndex);
+  getNextWord(): any {
+    const char = this.word.toString().charAt(this.wordIndex);
     this.wordIndex += 1;
     if (this.wordIndex >= this.word.length) {
-      this.wordIndex = 0;
+      false;
     }
     return char;
   }
