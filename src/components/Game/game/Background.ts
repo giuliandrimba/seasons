@@ -22,6 +22,8 @@ export default class Background {
     assets.forEach(asset => {
       const s = new Sprite(asset);
       s.filters = [this.filter];
+      s.width = window.innerWidth;
+      s.height = window.innerHeight;
       s.alpha = 0;
       this.images.push(s);
       container.addChild(s);

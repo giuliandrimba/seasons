@@ -137,6 +137,7 @@ export default class GridView {
   }
 
   nextLevel() {
+    this.score.text = ''
     this.gridModel.clear();
     this.currentLevel = this.currentLevel < 3 ? this.currentLevel + 1 : this.currentLevel = 0;
     this.word = this.levels[this.currentLevel];
