@@ -45,7 +45,7 @@ export default class Grid {
     }
     this.grid[this.cell.column][this.cell.row] = 1;
     this.emit('update', this.output())
-    this.interval = setTimeout(this.start, (1000 + Math.random() * 500));
+    this.interval = setTimeout(this.start, (700 + Math.random() * 500));
   }
 
   setState(position: any, state: number) {

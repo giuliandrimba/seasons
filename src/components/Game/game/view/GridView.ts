@@ -1,7 +1,8 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import Grid from '../model/Grid';
 import Cell from './Cell';
 import happens from 'happens';
+import gsap from 'gsap';
 
 const square = (width: number, height: number, color: number) => {
   const rect = new Container();
@@ -33,15 +34,18 @@ export default class GridView {
   private counter: number = 0;
   public on: Function;
   public emit: Function;
+  private score: Text;
   constructor(stage: Container, gridModel: Grid, theme: any) {
     happens(this);
     this.clickedCell = this.clickedCell.bind(this)
+    this.nextLevel = this.nextLevel.bind(this)
     this.gridModel = gridModel;
     this.color = theme.color.white.replace('#', '0x')
     this.width = this.gridModel.columns * CELL_SIZE;
     this.height = this.gridModel.rows * CELL_SIZE;
     this.container = new Container();
     this.resize();
+    this.container.alpha = 0;
     stage.addChild(this.container);
     this.buildGrid();
     this.addCells();
@@ -49,7 +53,6 @@ export default class GridView {
     this.clicked = this.clicked.bind(this);
     this.gridModel.on('update', this.update);
     this.gridModel.on('clicked', this.clicked);
-    this.nextLevel();
   }
 
   buildGrid() {
@@ -86,6 +89,22 @@ export default class GridView {
       colContainer.x = 0;
       this.container.addChild(colContainer)
     }
+
+    this.score = new Text('', {
+      fontFamily: "HelveticaNeueBold",
+      fontSize: 16,
+      letterSpacing: 3,
+      fill: 0xFFFFFF
+    })
+
+    this.score.anchor.set(0.5);
+    this.score.y = this.gridModel.rows * CELL_SIZE + 100;
+    this.score.x = (this.gridModel.columns * CELL_SIZE) / 2;
+    this.container.addChild(this.score);
+  }
+
+  intro() {
+    gsap.to(this.container, { duration: 1, alpha: 1, ease: 'expo.out', onComplete: this.nextLevel})
   }
 
   nextLevel() {
@@ -95,7 +114,6 @@ export default class GridView {
     this.wordIndex = 0;
     this.currentLetter = this.getNextWord();
     this.gridModel.start();
-    this.emit('next:level', this.currentLevel);
   }
 
   clicked(grid: any) {
@@ -103,12 +121,14 @@ export default class GridView {
     if (!next.length) {
       this.updateState(grid);
       this.stop();
-      this.emit('progress', 1);
       this.emit('complete');
+      this.score.text = this.word;
       return;
     }
     this.updateState(grid);
+    this.score.text = this.word.substring(0, this.wordIndex);
     this.currentLetter = this.getNextWord();
+    this.emit('progress', this.wordIndex / (this.word.length - 1) / 1.5);
   }
 
   update(grid: any) {
@@ -131,7 +151,6 @@ export default class GridView {
     if (this.wordIndex >= this.word.length) {
       false;
     }
-    this.emit('progress', this.wordIndex / (this.word.length - 1));
     return char;
   }
 

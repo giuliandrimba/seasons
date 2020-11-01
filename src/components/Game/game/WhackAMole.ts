@@ -36,7 +36,10 @@ export default class WhackAMole {
       this.background = new Background(this.pixi.stage, this.sprites);
       this.gridView = new GridView(this.pixi.stage, this.grid, this.theme);
       this.gridView.on('progress', this.background.progress);
-      this.gridView.on('next:level', this.background.nextLevel);
+      this.gridView.on('complete', this.background.complete);
+      this.background.intro(() => {
+        this.gridView.intro();
+      })
     })
   }
 

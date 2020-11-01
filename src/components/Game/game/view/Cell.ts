@@ -89,7 +89,6 @@ export default class Cell {
     gsap.to(this.animation, {
       duration: 0.5,
       progress: 0,
-      delay: 0.05,
       ease: 'expo.out',
       onUpdate: () => {
         this.sprite.scale.set(this.animation.progress);

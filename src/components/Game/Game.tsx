@@ -6,15 +6,18 @@ import { ThemeContext } from '../App/App';
 export default () => {
   const canvas = useRef(null);
   const theme = useContext(ThemeContext);
-  useEffect(() => {
-    const pixi = new WhackAMole(canvas.current, theme);
+  let pixi: any;
+
+  const resize = () => {
     canvas.current.setAttribute('width', window.innerWidth * 2);
     canvas.current.setAttribute('height', window.innerHeight * 2);
-    window.addEventListener('resize', () => {
-      canvas.current.setAttribute('width', window.innerWidth * 2);
-      canvas.current.setAttribute('height', window.innerHeight * 2);
-      pixi.resize();
-    })
+    pixi.resize();
+  }
+
+  useEffect(() => {
+    pixi = new WhackAMole(canvas.current, theme);
+    resize();
+    window.addEventListener('resize', resize)
   }, [])
 
   return (
