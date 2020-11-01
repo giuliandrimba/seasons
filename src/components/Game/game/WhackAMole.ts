@@ -15,7 +15,7 @@ export default class WhackAMole {
   private grid: Grid;
   private gridView: GridView;
   private background: Background;
-  private levels: Array<string> = ['WINTER', 'SPRING', 'SUMMER', "FALL"];
+  private loaded: boolean = false;
   constructor(canvas: any, theme: any) {
     happens(this);
     this.loader = PIXI.Loader.shared;
@@ -32,6 +32,7 @@ export default class WhackAMole {
     this.pixi = new PIXI.Application({ resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
     this.sprites = [];
     this.preloadAssets().then(() => {
+      this.loaded = true;
       this.background = new Background(this.pixi.stage, this.sprites);
       this.gridView = new GridView(this.pixi.stage, this.grid, this.theme);
       this.gridView.on('progress', this.background.progress);
@@ -56,5 +57,13 @@ export default class WhackAMole {
         });
       })
     })
+  }
+
+  resize() {
+    if (this.loaded) {
+      this.pixi.renderer.resize(window.innerWidth, window.innerHeight);
+      this.gridView.resize();
+      this.background.resize();
+    }
   }
 }

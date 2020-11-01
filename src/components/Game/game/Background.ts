@@ -27,4 +27,8 @@ export default class Background {
   }
 
   nextLevel(index: number) {}
+
+  resize() {
+
+  }
 }

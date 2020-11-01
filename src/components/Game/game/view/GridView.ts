@@ -41,8 +41,7 @@ export default class GridView {
     this.width = this.gridModel.columns * CELL_SIZE;
     this.height = this.gridModel.rows * CELL_SIZE;
     this.container = new Container();
-    this.container.x = window.innerWidth / 2 - this.width / 2
-    this.container.y = window.innerHeight / 2 - this.height / 2
+    this.resize();
     stage.addChild(this.container);
     this.buildGrid();
     this.addCells();
@@ -165,5 +164,10 @@ export default class GridView {
       c.y = row * CELL_SIZE;
       this.cells[col][row] = c;
     })
+  }
+
+  resize() {
+    this.container.x = window.innerWidth / 2 - this.width / 2
+    this.container.y = window.innerHeight / 2 - this.height / 2
   }
 }
