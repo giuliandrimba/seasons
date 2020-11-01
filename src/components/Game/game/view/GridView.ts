@@ -1,6 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
 import Grid from '../model/Grid';
 import Cell from './Cell';
+import happens from 'happens';
 
 const square = (width: number, height: number, color: number) => {
   const rect = new Container();
@@ -30,7 +31,10 @@ export default class GridView {
   private currentLetter: string = '';
   private wordIndex: number = 0;
   private counter: number = 0;
+  public on: Function;
+  public emit: Function;
   constructor(stage: Container, gridModel: Grid, theme: any) {
+    happens(this);
     this.clickedCell = this.clickedCell.bind(this)
     this.gridModel = gridModel;
     this.color = theme.color.white.replace('#', '0x')
@@ -92,12 +96,16 @@ export default class GridView {
     this.wordIndex = 0;
     this.currentLetter = this.getNextWord();
     this.gridModel.start();
+    this.emit('next:level', this.currentLevel);
   }
 
   clicked(grid: any) {
     const next = this.word.toString().charAt(this.wordIndex);
     if (!next.length) {
-      this.nextLevel();
+      this.updateState(grid);
+      this.stop();
+      this.emit('progress', 1);
+      this.emit('complete');
       return;
     }
     this.updateState(grid);
@@ -106,6 +114,10 @@ export default class GridView {
 
   update(grid: any) {
     this.updateState(grid);
+  }
+
+  stop() {
+    this.gridModel.clear();
   }
 
   updateState(grid: any) {
@@ -120,6 +132,7 @@ export default class GridView {
     if (this.wordIndex >= this.word.length) {
       false;
     }
+    this.emit('progress', this.wordIndex / (this.word.length - 1));
     return char;
   }
 

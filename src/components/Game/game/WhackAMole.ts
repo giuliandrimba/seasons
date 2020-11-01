@@ -4,6 +4,7 @@ import Grid from './model/Grid';
 import GridView from './view/GridView';
 import happens from 'happens';
 import FontFaceObserver from 'fontfaceobserver';
+import Background from './Background';
 
 export default class WhackAMole {
   private canvas: HTMLCanvasElement;
@@ -13,6 +14,8 @@ export default class WhackAMole {
   private theme: any;
   private grid: Grid;
   private gridView: GridView;
+  private background: Background;
+  private levels: Array<string> = ['WINTER', 'SPRING', 'SUMMER', "FALL"];
   constructor(canvas: any, theme: any) {
     happens(this);
     this.loader = PIXI.Loader.shared;
@@ -27,9 +30,12 @@ export default class WhackAMole {
 
   init() {
     this.pixi = new PIXI.Application({ resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
-    this.sprites = {};
+    this.sprites = [];
     this.preloadAssets().then(() => {
+      this.background = new Background(this.pixi.stage, this.sprites);
       this.gridView = new GridView(this.pixi.stage, this.grid, this.theme);
+      this.gridView.on('progress', this.background.progress);
+      this.gridView.on('next:level', this.background.nextLevel);
     })
   }
 
@@ -41,7 +47,7 @@ export default class WhackAMole {
       }
       this.loader.load((loader: PIXI.Loader, resources: any) => {
         for (let [key, value] of Object.entries(resources)) {
-          this.sprites[key] = new PIXI.Sprite(resources[key].texture);
+          this.sprites.push(resources[key].texture);
         }
         font.load().then(function () {
           resolve();

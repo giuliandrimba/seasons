@@ -9,5 +9,5 @@ declare module "*.png" {
 
 declare module 'fontfaceobserver';
 declare module 'scramble-text';
-
+declare module '@pixi/filter-displacement'
 declare module 'happens';
