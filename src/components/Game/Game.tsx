@@ -8,8 +8,8 @@ export default () => {
   const theme = useContext(ThemeContext);
   useEffect(() => {
     const pixi = new WhackAMole(canvas.current, theme);
-    canvas.current.setAttribute('width', window.innerWidth);
-    canvas.current.setAttribute('height', window.innerHeight);
+    canvas.current.setAttribute('width', window.innerWidth * 2);
+    canvas.current.setAttribute('height', window.innerHeight * 2);
   }, [])
   return (
     <CanvasElement

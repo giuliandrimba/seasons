@@ -3,6 +3,7 @@ import images from './images';
 import Grid from './model/Grid';
 import GridView from './view/GridView';
 import happens from 'happens';
+import FontFaceObserver from 'fontfaceobserver';
 
 export default class WhackAMole {
   private canvas: HTMLCanvasElement;
@@ -25,7 +26,7 @@ export default class WhackAMole {
   }
 
   init() {
-    this.pixi = new PIXI.Application({ width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
+    this.pixi = new PIXI.Application({ resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
     this.sprites = {};
     this.preloadAssets().then(() => {
       this.gridView = new GridView(this.pixi.stage, this.grid, this.theme);
@@ -34,6 +35,7 @@ export default class WhackAMole {
 
   preloadAssets(): Promise<any> {
     return new Promise(resolve => {
+      const font = new FontFaceObserver('HelveticaNeueBold');
       for (let [key, value] of Object.entries(images)) {
         this.loader.add(key, value);
       }
@@ -41,7 +43,11 @@ export default class WhackAMole {
         for (let [key, value] of Object.entries(resources)) {
           this.sprites[key] = new PIXI.Sprite(resources[key].texture);
         }
-        resolve();
+        font.load().then(function () {
+          resolve();
+        }, function () {
+          console.log('Font is not available');
+        });
       })
     })
   }

@@ -32,7 +32,7 @@ export default class Grid {
   }
 
   public increaseDifficulty() {
-    const interval = setTimeout(this.start, (1000 + Math.random() * 2000) / this.difficulty, this.intervals.length);
+    const interval = setTimeout(this.start, (1000 + Math.random() * 500) / this.difficulty, this.intervals.length);
     this.intervals.push(interval);
   }
 
@@ -55,12 +55,12 @@ export default class Grid {
     }
     this.grid[this.cells[level].column][this.cells[level].row] = 1;
     this.emit('update', this.output())
-    this.intervals[level] = setTimeout(this.start, (1000 + Math.random() * 1000) / this.difficulty, level)
+    this.intervals[level] = setTimeout(this.start, (1000 + Math.random() * 500) / this.difficulty, level)
   }
 
   setState(position: any, state: number) {
     this.grid[position.column][position.row] = 0;
-    this.emit('update', this.output())
+    this.emit('clicked', this.output())
   }
 
   clear() {

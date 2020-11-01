@@ -7,4 +7,7 @@ declare module "*.png" {
   export default value;
 }
 
+declare module 'fontfaceobserver';
+declare module 'scramble-text';
+
 declare module 'happens';
