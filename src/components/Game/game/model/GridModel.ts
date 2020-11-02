@@ -28,10 +28,6 @@ export default class GridModel {
   start() {
     let rndColumn = Math.floor(Math.random() * this.options.columns);
     let rndRow = Math.floor(Math.random() * this.options.rows);
-    while (this.grid[rndColumn][rndRow] === 1) {
-      rndColumn = Math.floor(Math.random() * this.options.columns);
-      rndRow = Math.floor(Math.random() * this.options.rows);
-    }
     if (!this.cell) {
       this.cell = {
         row: rndRow,
