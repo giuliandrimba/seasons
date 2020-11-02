@@ -27,6 +27,7 @@ export default class WhackAMole {
   private background: Background;
   private loaded: boolean = false;
   private gridContainer: any;
+  private preloader: PIXI.Text;
   constructor(canvas: any, theme: any) {
     happens(this);
     this.loader = PIXI.Loader.shared;
@@ -36,15 +37,28 @@ export default class WhackAMole {
       columns: 4,
       rows: 3
     })
-    this.init();
+    const font = new FontFaceObserver('HelveticaNeueBold');
+    font.load().then(this.init.bind(this));
   }
 
   init() {
     this.pixi = new PIXI.Application({ forceCanvas: true,resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
     this.sprites = [];
     this.gridContainer = square(window.innerWidth, window.innerHeight, 0xFFFFFF)
+    this.preloader = new PIXI.Text('Loading...', {
+      fontFamily: "HelveticaNeueBold",
+      fontSize: 16,
+      letterSpacing: 3,
+      fill: 0xFFFFFF
+    })
+
+    this.preloader.anchor.set(0.5);
+    this.preloader.y = window.innerHeight / 2;
+    this.preloader.x = window.innerWidth / 2;
+    this.pixi.stage.addChild(this.preloader);
     this.preloadAssets().then(() => {
       this.loaded = true;
+      this.preloader.alpha = 0;
       this.background = new Background(this.pixi.stage, this.sprites);
       this.gridView = new GridView(this.gridContainer, this.grid, this.theme);
       this.pixi.stage.addChild(this.gridContainer);
@@ -70,11 +84,7 @@ export default class WhackAMole {
         for (let [key, value] of Object.entries(resources)) {
           this.sprites.push(resources[key].texture);
         }
-        font.load().then(function () {
-          resolve();
-        }, function () {
-          console.log('Font is not available');
-        });
+        resolve()
       })
     })
   }
