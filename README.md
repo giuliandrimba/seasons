@@ -14,3 +14,10 @@ Build system boilerplate for React projects:
 * [Styled Components](https://styled-components.com/)
 * [TypeScript](https://www.typescriptlang.org/)
 * [Image optimization](https://github.com/Klathmon/imagemin-webpack-plugin)
+
+### __Running:__
+`yarn start`
+
+### __Building:__
+
+`yarn build`
