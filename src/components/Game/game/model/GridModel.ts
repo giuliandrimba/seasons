@@ -5,14 +5,13 @@ export interface GridOptions {
   rows: number;
 }
 
-export default class Grid {
-  private grid: Array<Array<number>> = []
-  private cell: {row: number, column: number};
+export default class GridModel {
+  private grid: Array<Array<number>> = [];
+  private cell: { row: number; column: number };
   private options: GridOptions;
   private interval: any;
   private emit: Function;
   constructor(options: GridOptions) {
-
     this.start = this.start.bind(this);
     this.clear = this.clear.bind(this);
 
@@ -27,30 +26,30 @@ export default class Grid {
   }
 
   start() {
-    let rndColumn = Math.floor(Math.random() * this.options.columns)
-    let rndRow = Math.floor(Math.random() * this.options.rows)
-    while (this.grid[rndColumn][rndRow] === 1)  {
-      rndColumn = Math.floor(Math.random() * this.options.columns)
-      rndRow = Math.floor(Math.random() * this.options.rows)
+    let rndColumn = Math.floor(Math.random() * this.options.columns);
+    let rndRow = Math.floor(Math.random() * this.options.rows);
+    while (this.grid[rndColumn][rndRow] === 1) {
+      rndColumn = Math.floor(Math.random() * this.options.columns);
+      rndRow = Math.floor(Math.random() * this.options.rows);
     }
     if (!this.cell) {
       this.cell = {
         row: rndRow,
         column: rndColumn,
-      }
+      };
     } else {
       this.grid[this.cell.column][this.cell.row] = 0;
       this.cell.row = rndRow;
       this.cell.column = rndColumn;
     }
     this.grid[this.cell.column][this.cell.row] = 1;
-    this.emit('update', this.output())
-    this.interval = setTimeout(this.start, (700 + Math.random() * 500));
+    this.emit('update', this.output());
+    this.interval = setTimeout(this.start, 700 + Math.random() * 500);
   }
 
   setState(position: any, state: number) {
     this.grid[position.column][position.row] = 0;
-    this.emit('clicked', this.output())
+    this.emit('clicked', this.output());
   }
 
   clear() {
@@ -58,8 +57,8 @@ export default class Grid {
   }
 
   public iterate(cb: Function) {
-    for (let col = 0; col < this.columns; col ++) {
-      for (let row = 0; row < this.rows; row ++) {
+    for (let col = 0; col < this.columns; col++) {
+      for (let row = 0; row < this.rows; row++) {
         cb(col, row);
       }
     }

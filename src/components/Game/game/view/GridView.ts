@@ -1,18 +1,10 @@
 import { Container, Graphics, Text } from 'pixi.js';
 import { BulgePinchFilter } from '@pixi/filter-bulge-pinch';
-import Grid from '../model/Grid';
+import Grid from '../model/GridModel';
 import Cell from './Cell';
+import Square from './Square';
 import happens from 'happens';
 import gsap from 'gsap';
-
-const square = (width: number, height: number, color: number) => {
-  const rect = new Container();
-  const graphics = new Graphics();
-  graphics.beginFill(color);
-  graphics.drawRect(0, 0, width, height);
-  rect.addChild(graphics);
-  return rect;
-}
 
 const CELL_SIZE = 110;
 
@@ -27,119 +19,74 @@ export default class GridView {
   private height: number;
   private color: number;
   private cells: Array<Array<Cell>> = [];
-  private levels: Array<string> = ['WINTER', 'SPRING', 'SUMMER', "FALL"]
-  private word: string = '';;
+  private levels: Array<string> = ['WINTER', 'SPRING', 'SUMMER', 'FALL'];
+  private word: string = '';
   private currentLevel: number = -1;
   private currentLetter: string = '';
   private wordIndex: number = 0;
   private counter: number = 0;
-  private filter :any;
+  private filter: any;
   private filterAnimation: {
     center: {
-      x: number,
-      y: number,
-    },
-  }
+      x: number;
+      y: number;
+    };
+  };
   public on: Function;
   public emit: Function;
   private score: Text;
   constructor(stage: Container, gridModel: Grid, theme: any) {
     happens(this);
-    this.clickedCell = this.clickedCell.bind(this)
-    this.nextLevel = this.nextLevel.bind(this)
-    this.onMouseMove = this.onMouseMove.bind(this)
-    this.filterAnimation = { center: { x: 0.5, y: 0.5 } }
+    this.clickedCell = this.clickedCell.bind(this);
+    this.nextLevel = this.nextLevel.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.update = this.update.bind(this);
+    this.clicked = this.clicked.bind(this);
+
+    this.filterAnimation = { center: { x: 0.5, y: 0.5 } };
     this.gridModel = gridModel;
-    this.color = theme.color.white.replace('#', '0x')
+    this.color = theme.color.white.replace('#', '0x');
     this.width = this.gridModel.columns * CELL_SIZE;
     this.height = this.gridModel.rows * CELL_SIZE;
     this.container = new Container();
     this.container.buttonMode = true;
-    this.filter = new BulgePinchFilter({ strength: 1, radius: 100 })
-    // stage.filters = [this.filter];
-    this.resize();
+    this.filter = new BulgePinchFilter({ strength: 1, radius: 100 });
     this.container.alpha = 0;
     stage.addChild(this.container);
+
+    this.resize();
     this.buildGrid();
     this.addCells();
-    this.update = this.update.bind(this);
-    this.clicked = this.clicked.bind(this);
+
     this.gridModel.on('update', this.update);
     this.gridModel.on('clicked', this.clicked);
   }
 
-  buildGrid() {
-    this.borderTop = square(this.width, 3, this.color);
-    this.borderTop.x = 0;
-    this.borderTop.y = 0;
-    this.container.addChild(this.borderTop);
-
-    this.borderRight = square(3, this.height, this.color);
-    this.borderRight.x = this.width;
-    this.borderRight.y = 0;
-    this.container.addChild(this.borderRight);
-
-    this.borderBottom = square(this.width, 3, this.color);
-    this.borderBottom.x = 0;
-    this.borderBottom.y = this.height;
-    this.container.addChild(this.borderBottom);
-
-    this.borderLeft = square(3, this.height, this.color);
-    this.borderLeft.x = 0;
-    this.borderLeft.y = 0;
-    this.container.addChild(this.borderLeft);
-
-    for (let col = 1; col < this.gridModel.columns; col++) {
-      const colContainer = square(1, this.height, this.color);
-      colContainer.x = col * CELL_SIZE;
-      colContainer.y = 0;
-      this.container.addChild(colContainer)
-    }
-
-    for (let row = 1; row < this.gridModel.rows; row++) {
-      const colContainer = square(this.width, 1, this.color);
-      colContainer.y = row * CELL_SIZE;
-      colContainer.x = 0;
-      this.container.addChild(colContainer)
-    }
-
-    this.score = new Text('', {
-      fontFamily: "HelveticaNeueBold",
-      fontSize: 16,
-      letterSpacing: 3,
-      fill: 0xFFFFFF
-    })
-
-    this.score.anchor.set(0.5);
-    this.score.y = this.gridModel.rows * CELL_SIZE + 100;
-    this.score.x = (this.gridModel.columns * CELL_SIZE) / 2;
-    this.container.addChild(this.score);
-  }
-
   onMouseMove(e: any) {
-
-    const x = e.clientX;
-    const y = e.clientY;
-
     gsap.to(this.filterAnimation.center, {
       duration: 0.5,
-      x: x / window.innerWidth,
-      y: y / window.innerHeight,
+      x: e.clientX / window.innerWidth,
+      y: e.clientY / window.innerHeight,
       onUpdate: () => {
-        this.filter.center = [this.filterAnimation.center.x, this.filterAnimation.center.y]
-      }
-    })
+        this.filter.center = [this.filterAnimation.center.x, this.filterAnimation.center.y];
+      },
+    });
   }
 
   intro() {
-    gsap.to(this.container, { duration: 1, alpha: 1, ease: 'expo.out', onComplete: this.nextLevel})
+    gsap.to(this.container, {
+      duration: 1,
+      alpha: 1,
+      ease: 'expo.out',
+      onComplete: this.nextLevel,
+    });
     window.addEventListener('mousemove', this.onMouseMove);
   }
 
   nextLevel() {
-    this.score.text = ''
+    this.score.text = '';
     this.gridModel.clear();
-    this.currentLevel = this.currentLevel < 3 ? this.currentLevel + 1 : this.currentLevel = 0;
+    this.currentLevel = this.currentLevel < 3 ? this.currentLevel + 1 : (this.currentLevel = 0);
     this.word = this.levels[this.currentLevel];
     this.wordIndex = 0;
     this.currentLetter = this.getNextWord();
@@ -172,7 +119,7 @@ export default class GridView {
   updateState(grid: any) {
     this.gridModel.iterate((col: number, row: number) => {
       this.cells[col][row].update(grid[col][row], this.currentLetter);
-    })
+    });
   }
 
   getNextWord(): any {
@@ -182,16 +129,6 @@ export default class GridView {
       false;
     }
     return char;
-  }
-
-  checkLevel() {
-    this.counter += 1;
-    if (this.counter % 10 === 0 && this.counter <= 10) {
-      this.gridModel.increaseDifficulty();
-    }
-    if (this.counter === 20) {
-      this.gridModel.clear();
-    }
   }
 
   clickedCell(cell: Cell) {
@@ -212,11 +149,59 @@ export default class GridView {
       c.x = col * CELL_SIZE;
       c.y = row * CELL_SIZE;
       this.cells[col][row] = c;
-    })
+    });
   }
 
   resize() {
-    this.container.x = window.innerWidth / 2 - this.width / 2
-    this.container.y = window.innerHeight / 2 - this.height / 2
+    this.container.x = window.innerWidth / 2 - this.width / 2;
+    this.container.y = window.innerHeight / 2 - this.height / 2;
+  }
+
+  buildGrid() {
+    this.borderTop = new Square(this.width, 3, this.color);
+    this.borderTop.x = 0;
+    this.borderTop.y = 0;
+    this.container.addChild(this.borderTop);
+
+    this.borderRight = new Square(3, this.height, this.color);
+    this.borderRight.x = this.width;
+    this.borderRight.y = 0;
+    this.container.addChild(this.borderRight);
+
+    this.borderBottom = new Square(this.width, 3, this.color);
+    this.borderBottom.x = 0;
+    this.borderBottom.y = this.height;
+    this.container.addChild(this.borderBottom);
+
+    this.borderLeft = new Square(3, this.height, this.color);
+    this.borderLeft.x = 0;
+    this.borderLeft.y = 0;
+    this.container.addChild(this.borderLeft);
+
+    for (let col = 1; col < this.gridModel.columns; col++) {
+      const colContainer = new Square(1, this.height, this.color);
+      colContainer.x = col * CELL_SIZE;
+      colContainer.y = 0;
+      this.container.addChild(colContainer);
+    }
+
+    for (let row = 1; row < this.gridModel.rows; row++) {
+      const colContainer = new Square(this.width, 1, this.color);
+      colContainer.y = row * CELL_SIZE;
+      colContainer.x = 0;
+      this.container.addChild(colContainer);
+    }
+
+    this.score = new Text('', {
+      fontFamily: 'HelveticaNeueBold',
+      fontSize: 16,
+      letterSpacing: 3,
+      fill: 0xffffff,
+    });
+
+    this.score.anchor.set(0.5);
+    this.score.y = this.gridModel.rows * CELL_SIZE + 100;
+    this.score.x = (this.gridModel.columns * CELL_SIZE) / 2;
+    this.container.addChild(this.score);
   }
 }

@@ -1,26 +1,7 @@
 import { BLEND_MODES, Container, Graphics, Sprite, Text, TextStyle, WRAP_MODES } from 'pixi.js';
 import happens from 'happens';
 import gsap from 'gsap';
-
-const alphabet = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-];
+import alphabet from '../../../../library/alphabet';
 
 export default class Cell {
   private state: number = 0;
@@ -37,34 +18,46 @@ export default class Cell {
   };
 
   constructor(container: Container, size: number, position: string) {
+    this.onClick = this.onClick.bind(this);
+
     this.position = position;
     this.size = size;
     this.animation = {
       progress: 0,
     };
+
+    this.sprite = new Container();
+    this.sprite.buttonMode = true;
+    this.sprite.interactive = true;
+    container.addChild(this.sprite);
+
+    this.createType();
+    this.createHitSquare();
+
+    this.sprite.on('mousedown', this.onClick).on('touchstart', this.onClick);
+    happens(this);
+  }
+
+  createType() {
     const style = new TextStyle({
       fontFamily: 'HelveticaNeueBold',
       fontSize: 75,
       fill: 0xffffff,
     });
-    this.sprite = new Container();
     this.text = new Text('', style);
     this.text.anchor.set(0.5);
+    this.sprite.addChild(this.text);
+  }
+
+  createHitSquare() {
     this.graphics = Sprite.from('/backgrounds/displacement.jpg');
-    this.graphics.width = size;
-    this.graphics.height = size;
+    this.graphics.width = this.size;
+    this.graphics.height = this.size;
     this.graphics.alpha = 0;
     this.graphics.anchor.set(0.5);
     this.graphics.texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
     this.graphics.blendMode = BLEND_MODES.ADD;
     this.sprite.addChild(this.graphics);
-    this.sprite.addChild(this.text);
-    this.sprite.buttonMode = true;
-    this.sprite.interactive = true;
-    this.onClick = this.onClick.bind(this);
-    this.sprite.on('mousedown', this.onClick).on('touchstart', this.onClick);
-    container.addChild(this.sprite);
-    happens(this);
   }
 
   onClick() {
@@ -79,20 +72,18 @@ export default class Cell {
   }
 
   update(state: number, finalLetter: string) {
+    this.finalLetter = finalLetter;
     if (this.state !== state) {
       this.state = state;
       if (state === 1) {
-        this.finalLetter = finalLetter;
         this.show(finalLetter);
       } else {
-        this.finalLetter = finalLetter;
         this.hide();
       }
     }
   }
 
   show(finalLetter: string) {
-    // gsap.fromTo(this.sprite, { scale: 0 }, { duration: 1, scale: 1, ease: 'expo.out' })
     gsap.fromTo(
       this.animation,
       { progress: 0.5 },
@@ -112,6 +103,7 @@ export default class Cell {
       }
     );
   }
+
   hide() {
     gsap.killTweensOf(this.animation);
     this.text.text = this.finalLetter;
@@ -123,7 +115,6 @@ export default class Cell {
         this.text.scale.set(this.animation.progress);
       },
     });
-    // gsap.to(this.sprite, { duration: 0.5, scale: 0, ease: 'expo.out' })
   }
 
   get gridPosition(): any {
