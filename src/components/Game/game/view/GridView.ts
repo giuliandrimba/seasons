@@ -10,10 +10,7 @@ const CELL_SIZE = 110;
 
 export default class GridView {
   private container: Container;
-  private borderTop: Container;
-  private borderRight: Container;
-  private borderBottom: Container;
-  private borderLeft: Container;
+  private borders: Container;
   private gridModel: any;
   private width: number;
   private height: number;
@@ -24,7 +21,6 @@ export default class GridView {
   private currentLevel: number = -1;
   private currentLetter: string = '';
   private wordIndex: number = 0;
-  private counter: number = 0;
   private filter: any;
   private filterAnimation: {
     center: {
@@ -158,25 +154,12 @@ export default class GridView {
   }
 
   buildGrid() {
-    this.borderTop = new Square(this.width, 3, this.color);
-    this.borderTop.x = 0;
-    this.borderTop.y = 0;
-    this.container.addChild(this.borderTop);
-
-    this.borderRight = new Square(3, this.height, this.color);
-    this.borderRight.x = this.width;
-    this.borderRight.y = 0;
-    this.container.addChild(this.borderRight);
-
-    this.borderBottom = new Square(this.width, 3, this.color);
-    this.borderBottom.x = 0;
-    this.borderBottom.y = this.height;
-    this.container.addChild(this.borderBottom);
-
-    this.borderLeft = new Square(3, this.height, this.color);
-    this.borderLeft.x = 0;
-    this.borderLeft.y = 0;
-    this.container.addChild(this.borderLeft);
+    this.borders = new Container();
+    const rect = new Graphics();
+    rect.lineStyle(3, this.color);
+    rect.drawRect(0, 0, this.width, this.height);
+    this.borders.addChild(rect);
+    this.container.addChild(this.borders);
 
     for (let col = 1; col < this.gridModel.columns; col++) {
       const colContainer = new Square(1, this.height, this.color);
