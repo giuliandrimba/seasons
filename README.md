@@ -16,6 +16,7 @@ Build system boilerplate for React projects:
 * [Image optimization](https://github.com/Klathmon/imagemin-webpack-plugin)
 
 ### __Running:__
+`yarn install`
 `yarn start`
 
 ### __Building:__
