@@ -2,6 +2,7 @@ import { BLEND_MODES, Container, Graphics, Sprite, Text, TextStyle, WRAP_MODES }
 import happens from 'happens';
 import gsap from 'gsap';
 import alphabet from '../../../../library/alphabet';
+import images from '../images';
 
 export default class Cell {
   private state: number = 0;
@@ -50,7 +51,7 @@ export default class Cell {
   }
 
   createHitSquare() {
-    this.graphics = Sprite.from('/backgrounds/displacement.jpg');
+    this.graphics = Sprite.from(images.displacement);
     this.graphics.width = this.size;
     this.graphics.height = this.size;
     this.graphics.alpha = 0;

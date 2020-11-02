@@ -76,13 +76,12 @@ export default class WhackAMole {
 
   preloadAssets(): Promise<any> {
     return new Promise((resolve) => {
-      const font = new FontFaceObserver('HelveticaNeueBold');
       for (let [key, value] of Object.entries(images)) {
         this.loader.add(key, value);
       }
       this.loader.load((loader: PIXI.Loader, resources: any) => {
         for (let [key, value] of Object.entries(resources)) {
-          this.sprites.push(resources[key].texture);
+          if (key !== 'displacement') this.sprites.push(resources[key].texture);
         }
         resolve();
       });

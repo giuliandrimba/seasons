@@ -1,6 +1,7 @@
 import { DisplacementFilter } from '@pixi/filter-displacement';
 import { Container, Sprite, Texture, WRAP_MODES } from 'pixi.js';
 import gsap from 'gsap';
+import images from '../game/images';
 import resize from '@doublepi/resize';
 
 const FACTOR = 2000;
@@ -19,19 +20,19 @@ export default class Background {
     this.createDisplacementFilter();
 
     assets.forEach((asset) => {
-      const s = new Sprite(asset);
-      s.filters = [this.filter];
-      s.width = window.innerWidth;
-      s.height = window.innerHeight;
-      s.alpha = 0;
-      this.images.push(s);
-      this.container.addChild(s);
+      const sp = new Sprite(asset);
+      sp.filters = [this.filter];
+      sp.width = window.innerWidth;
+      sp.height = window.innerHeight;
+      sp.alpha = 0;
+      this.images.push(sp);
+      this.container.addChild(sp);
     });
     this.resize();
   }
 
   createDisplacementFilter() {
-    this.displacementSprite = Sprite.from('/backgrounds/displacement.jpg');
+    this.displacementSprite = Sprite.from(images.displacement);
     this.displacementSprite.texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
     this.filter = new DisplacementFilter(this.displacementSprite);
     this.filter.scale.x = 0;
