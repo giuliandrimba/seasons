@@ -1,8 +1,26 @@
-import { BLEND_MODES, Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { BLEND_MODES, Container, Graphics, Sprite, Text, TextStyle, WRAP_MODES } from 'pixi.js';
 import happens from 'happens';
 import gsap from 'gsap';
 
-const alphabet = ['A','B', 'C', 'D', "E", 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
+const alphabet = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+];
 
 export default class Cell {
   private state: number = 0;
@@ -15,30 +33,32 @@ export default class Cell {
   public emit: Function;
   private graphics: any;
   private animation: {
-    progress: number
-  }
+    progress: number;
+  };
 
   constructor(container: Container, size: number, position: string) {
     this.position = position;
     this.size = size;
     this.animation = {
-      progress: 0
-    }
+      progress: 0,
+    };
     const style = new TextStyle({
-      fontFamily: "HelveticaNeueBold",
+      fontFamily: 'HelveticaNeueBold',
       fontSize: 75,
-      fill: 0xFFFFFF
+      fill: 0xffffff,
     });
     this.sprite = new Container();
     this.text = new Text('', style);
     this.text.anchor.set(0.5);
-    this.graphics = new Graphics();
-    this.graphics.beginFill(0xFFFFFF);
+    this.graphics = Sprite.from('/backgrounds/displacement.jpg');
+    this.graphics.width = size;
+    this.graphics.height = size;
     this.graphics.alpha = 0;
-    this.graphics.drawRect(-size / 2, -size / 2, size + 1, size + 1);
+    this.graphics.anchor.set(0.5);
+    this.graphics.texture.baseTexture.wrapMode = WRAP_MODES.REPEAT;
+    this.graphics.blendMode = BLEND_MODES.ADD;
     this.sprite.addChild(this.graphics);
-    this.text.blendMode = BLEND_MODES.EXCLUSION;
-    this.sprite.addChild(this.text)
+    this.sprite.addChild(this.text);
     this.sprite.buttonMode = true;
     this.sprite.interactive = true;
     this.onClick = this.onClick.bind(this);
@@ -47,13 +67,13 @@ export default class Cell {
     happens(this);
   }
 
-  onClick(){
+  onClick() {
     if (this.state === 1) {
       gsap.killTweensOf(this.animation);
       this.text.text = this.finalLetter;
       this.graphics.alpha = 0.8;
       gsap.killTweensOf(this.graphics);
-      gsap.to(this.graphics, { duration: 0.15, alpha: 0, delay: 0.4 })
+      gsap.to(this.graphics, { duration: 0.15, alpha: 0, delay: 0.4 });
       this.emit('click', this);
     }
   }
@@ -73,20 +93,24 @@ export default class Cell {
 
   show(finalLetter: string) {
     // gsap.fromTo(this.sprite, { scale: 0 }, { duration: 1, scale: 1, ease: 'expo.out' })
-    gsap.fromTo(this.animation, {progress: 0.5}, {
-      duration: 0.7,
-      progress: 1,
-      ease: 'power4.out',
-      onUpdate: () => {
-        this.text.scale.set(this.animation.progress);
-        const index = Math.floor(Math.random() * alphabet.length);
-        if (this.animation.progress >= 0.99) {
-          this.text.text = finalLetter;
-        } else {
-          this.text.text = alphabet[index];
-        }
+    gsap.fromTo(
+      this.animation,
+      { progress: 0.5 },
+      {
+        duration: 0.7,
+        progress: 1,
+        ease: 'power4.out',
+        onUpdate: () => {
+          this.text.scale.set(this.animation.progress);
+          const index = Math.floor(Math.random() * alphabet.length);
+          if (this.animation.progress >= 0.99) {
+            this.text.text = finalLetter;
+          } else {
+            this.text.text = alphabet[index];
+          }
+        },
       }
-    })
+    );
   }
   hide() {
     gsap.killTweensOf(this.animation);
@@ -98,7 +122,7 @@ export default class Cell {
       onUpdate: () => {
         this.text.scale.set(this.animation.progress);
       },
-    })
+    });
     // gsap.to(this.sprite, { duration: 0.5, scale: 0, ease: 'expo.out' })
   }
 
@@ -106,8 +130,8 @@ export default class Cell {
     const parsed = this.position.split(':');
     return {
       column: parsed[0],
-      row:parsed[1]
-    }
+      row: parsed[1],
+    };
   }
 
   set x(value: number) {
@@ -115,6 +139,6 @@ export default class Cell {
   }
 
   set y(value: number) {
-    this.sprite.y = value + this.size / 2
+    this.sprite.y = value + this.size / 2;
   }
 }
