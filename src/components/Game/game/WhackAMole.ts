@@ -40,7 +40,7 @@ export default class WhackAMole {
   }
 
   init() {
-    this.pixi = new PIXI.Application({ resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
+    this.pixi = new PIXI.Application({ forceCanvas: true,resolution: 2, width: window.innerWidth, height: innerHeight, view: this.canvas, backgroundColor: this.theme.color.darkGray.replace('#', '0x')});
     this.sprites = [];
     this.gridContainer = square(window.innerWidth, window.innerHeight, 0xFFFFFF)
     this.preloadAssets().then(() => {

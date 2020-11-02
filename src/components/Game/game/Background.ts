@@ -1,6 +1,7 @@
 import { DisplacementFilter } from '@pixi/filter-displacement';
 import { Container, Sprite, Texture, WRAP_MODES } from 'pixi.js';
 import gsap from 'gsap';
+import resize from '@doublepi/resize';
 
 const FACTOR = 2000;
 
@@ -28,6 +29,7 @@ export default class Background {
       this.images.push(s);
       container.addChild(s);
     })
+    this.resize();
   }
 
   intro(cb: any) {
@@ -55,6 +57,10 @@ export default class Background {
   }
 
   resize() {
-
+    const size = resize(1920, 1080, window.innerWidth, window.innerHeight);
+    this.images.forEach(s => {
+      s.width = size.width;
+      s.height = size.height;
+    })
   }
 }

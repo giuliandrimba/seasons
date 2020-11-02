@@ -1,4 +1,4 @@
-import { Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { BLEND_MODES, Container, Graphics, Text, TextStyle } from 'pixi.js';
 import happens from 'happens';
 import gsap from 'gsap';
 
@@ -13,6 +13,7 @@ export default class Cell {
   private text: Text;
   public on: Function;
   public emit: Function;
+  private graphics: any;
   private animation: {
     progress: number
   }
@@ -31,11 +32,12 @@ export default class Cell {
     this.sprite = new Container();
     this.text = new Text('', style);
     this.text.anchor.set(0.5);
-    const graphics = new Graphics();
-    graphics.beginFill(0xFF0000);
-    graphics.alpha = 0;
-    graphics.drawRect(-size / 2, -size / 2, size, size);
-    this.sprite.addChild(graphics);
+    this.graphics = new Graphics();
+    this.graphics.beginFill(0xFFFFFF);
+    this.graphics.alpha = 0;
+    this.graphics.drawRect(-size / 2, -size / 2, size + 1, size + 1);
+    this.sprite.addChild(this.graphics);
+    this.text.blendMode = BLEND_MODES.EXCLUSION;
     this.sprite.addChild(this.text)
     this.sprite.buttonMode = true;
     this.sprite.interactive = true;
@@ -49,6 +51,9 @@ export default class Cell {
     if (this.state === 1) {
       gsap.killTweensOf(this.animation);
       this.text.text = this.finalLetter;
+      this.graphics.alpha = 0.8;
+      gsap.killTweensOf(this.graphics);
+      gsap.to(this.graphics, { duration: 0.15, alpha: 0, delay: 0.4 })
       this.emit('click', this);
     }
   }
@@ -73,7 +78,7 @@ export default class Cell {
       progress: 1,
       ease: 'power4.out',
       onUpdate: () => {
-        this.sprite.scale.set(this.animation.progress);
+        this.text.scale.set(this.animation.progress);
         const index = Math.floor(Math.random() * alphabet.length);
         if (this.animation.progress >= 0.99) {
           this.text.text = finalLetter;
@@ -91,8 +96,8 @@ export default class Cell {
       progress: 0,
       ease: 'expo.out',
       onUpdate: () => {
-        this.sprite.scale.set(this.animation.progress);
-      }
+        this.text.scale.set(this.animation.progress);
+      },
     })
     // gsap.to(this.sprite, { duration: 0.5, scale: 0, ease: 'expo.out' })
   }
