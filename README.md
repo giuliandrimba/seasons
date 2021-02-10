@@ -1,4 +1,4 @@
-# Alfa
+# SEASONS
 
 <p align="center">
     <img src="https://raw.githubusercontent.com/giuliandrimba/seasons/master/public/cover.jpg" alt="Alfa" />
