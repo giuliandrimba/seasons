@@ -1,7 +1,7 @@
 # Alfa
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/giuliandrimba/alfa/master/public/cover.jpg" alt="Alfa" />
+    <img src="https://raw.githubusercontent.com/giuliandrimba/seasons/master/public/cover.jpg" alt="Alfa" />
 </p>
 
 
